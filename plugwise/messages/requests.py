@@ -24,29 +24,33 @@ class NodeRequest(PlugwiseMessage):
 
 class NodeNetworkInfoRequest(NodeRequest):
     """TODO: PublicNetworkInfoRequest
+    Request network info
 
-    No arguments
+    Response message: CirclePlusConnectResponse, CirclePlusQueryEndResponse
     """
 
     ID = b"0001"
+
+    def __init__(self):
+        """message for that initializes the Stick"""
+        # doesn't send MAC address
+        super().__init__("")
 
 
 class CirclePlusConnectRequest(NodeRequest):
     """
     Request to connect a Circle+ to the Stick
 
-    Response message: CirclePlusConnectResponse
+    Response message: NodeJoinAckResponse, CirclePlusConnectResponse
     """
 
     ID = b"0004"
 
-    # This message has an exceptional format and therefore need to override the serialize method
-    def serialize(self):
-        # This command has args: byte: key, byte: networkinfo.index, ulong: networkkey = 0
-        args = b"00000000000000000000"
-        msg = self.ID + args + self.mac
-        checksum = self.calculate_checksum(msg)
-        return MESSAGE_HEADER + msg + checksum + MESSAGE_FOOTER
+    def __init__(self, mac, key, networkinfo_index = 1, networkkey = 0):
+        super().__init__(mac)
+        self.args.append(Int(key, length=2))
+        self.args.append(Int(networkinfo_index, length=2))
+        self.args.append(Int(networkkey, length=16))
 
 
 class NodeAddRequest(NodeRequest):
@@ -62,14 +66,6 @@ class NodeAddRequest(NodeRequest):
         super().__init__(mac)
         accept_value = 1 if accept else 0
         self.args.append(Int(accept_value, length=2))
-
-    # This message has an exceptional format (MAC at end of message)
-    # and therefore a need to override the serialize method
-    def serialize(self):
-        args = b"".join(a.serialize() for a in self.args)
-        msg = self.ID + args + self.mac
-        checksum = self.calculate_checksum(msg)
-        return MESSAGE_HEADER + msg + checksum + MESSAGE_FOOTER
 
 
 class NodeAllowJoiningRequest(NodeRequest):
@@ -117,7 +113,7 @@ class StickInitRequest(NodeRequest):
 
     def __init__(self):
         """message for that initializes the Stick"""
-        # init is the only request message that doesn't send MAC address
+        # init doesn't send MAC address
         super().__init__("")
 
 
