@@ -122,7 +122,7 @@ class CirclePlusQueryResponse(NodeResponse):
     """
     TODO:
 
-    Response to : ???
+    Response to : NodeNetworkInfoRequest
     """
 
     ID = b"0002"
@@ -162,7 +162,7 @@ class CirclePlusQueryEndResponse(NodeResponse):
         PWAckReplyV1_0
         <argument name="code" length="2"/>
 
-    Response to : ???
+    Response to : NodeNetworkInfoRequest
     """
 
     ID = b"0003"
@@ -506,7 +506,7 @@ class NodeJoinAckResponse(NodeResponse):
     Notification message when node (re)joined existing network again.
     Sent when a SED (re)joins the network e.g. when you reinsert the battery of a Scan
 
-    Response to: <nothing> or NodeAddRequest
+    Response to: <nothing> or NodeAddRequest or CirclePlusConnectRequest
     """
 
     ID = b"0061"
